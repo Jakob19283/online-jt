@@ -6,23 +6,27 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #f0f4f8; color: #333; display: flex; min-height: 100vh; }
+    body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #f0f4f8; color: #333; display: flex; min-height: 100vh; transition: margin-left 0.3s; }
 
-    header { position: fixed; top: 0; left: 0; right: 0; background-color: #ff6b6b; color: #fff; padding: 15px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1000; }
+    header { position: fixed; top: 0; left: 0; right: 0; background-color: #ff6b6b; color: #fff; padding: 15px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1000; display: flex; justify-content: space-between; align-items: center; }
     header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
 
-    .sidebar { width: 220px; background-color: #fff; border-left: 1px solid #ddd; padding: 20px; margin-top: 70px; position: fixed; right: 0; top: 0; height: 100vh; overflow-y: auto; }
+    .sidebar { width: 220px; background-color: #fff; border-right: 1px solid #ddd; padding: 20px; margin-top: 70px; position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; transition: transform 0.3s ease; }
+    .sidebar.hidden { transform: translateX(-100%); }
     .sidebar button { display: block; width: 100%; margin-bottom: 12px; padding: 10px; border: 2px solid #ff6b6b; border-radius: 8px; background-color: #fff; font-weight: 600; text-align: left; transition: all 0.2s; }
     .sidebar button.active { background-color: #ff6b6b; color: #fff; }
 
-    .content { flex: 1; margin-left: 0; margin-right: 240px; padding: 90px 20px 20px 20px; }
+    .toggle-btn { position: fixed; top: 80px; left: 0; z-index: 1100; background-color: #ff6b6b; color: #fff; border: none; border-radius: 0 8px 8px 0; padding: 8px 12px; cursor: pointer; font-weight: 600; }
+
+    .content { flex: 1; margin-left: 240px; padding: 90px 20px 20px 20px; transition: margin-left 0.3s; }
+    .content.full { margin-left: 0; }
 
     .articles { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
     .article { background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
     .article:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
     .article img { width: 100%; object-fit: contain; }
     .article h3 { margin: 16px; font-size: 1.1rem; }
-    .article p { margin: 0 16px 16px 16px; color: #555; font-size: 0.9rem; max-height: 60px; overflow: hidden; }
+    .article p { margin: 0 16px 16px 16px; color: #555; font-size: 0.9rem; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
     .article button { margin: 0 16px 16px 16px; padding: 8px 0; border: none; border-radius: 6px; background-color: #ff6b6b; color: #fff; font-weight: 600; transition: background-color 0.2s; }
     .article button:hover { background-color: #ff4c4c; }
 
@@ -36,10 +40,9 @@
     footer { text-align: center; padding: 24px 0; color: #888; font-size: 0.9rem; background-color: #f0f4f8; border-top: 1px solid #e5e7eb; margin-top: 20px; }
 
     @media (max-width: 768px) {
-      .sidebar { position: relative; width: 100%; height: auto; border-left: none; margin-top: 0; }
-      .content { margin-right: 0; padding-top: 120px; }
+      .sidebar { position: fixed; top: 0; left: 0; height: 100vh; transform: translateX(-100%); z-index: 1000; }
+      .content { margin-left: 0; padding-top: 120px; }
       .articles { grid-template-columns: 1fr; }
-      .article img { height: auto; }
     }
   </style>
 </head>
@@ -49,6 +52,7 @@
   <h1>Kinder Helfer News</h1>
 </header>
 
+<button class="toggle-btn" id="toggleBtn">☰</button>
 <div class="sidebar" id="tabs"></div>
 <div class="content" id="tabContent"></div>
 <div id="articleDetail"></div>
@@ -71,25 +75,28 @@ const tabsData = [
 ];
 
 let currentTab = 'woGeldHin';
+const sidebar = document.getElementById('tabs');
+const contentDiv = document.getElementById('tabContent');
+const toggleBtn = document.getElementById('toggleBtn');
+let sidebarVisible = true;
 
 function renderTabs() {
-  const container = document.getElementById('tabs');
-  container.innerHTML = '';
+  sidebar.innerHTML = '';
   tabsData.forEach(tab => {
     const btn = document.createElement('button');
     btn.textContent = tab.name;
     if(tab.id === currentTab) btn.classList.add('active');
     btn.onclick = () => { currentTab = tab.id; renderTabs(); renderTabContent(); };
-    container.appendChild(btn);
+    sidebar.appendChild(btn);
   });
 }
 
 function renderTabContent() {
-  const container = document.getElementById('tabContent');
-  container.innerHTML = '';
+  contentDiv.innerHTML = '';
   const tab = tabsData.find(t => t.id === currentTab);
   const grid = document.createElement('div');
   grid.className = 'articles';
+
   tab.articles.forEach(article => {
     const div = document.createElement('div');
     div.className = 'article';
@@ -106,17 +113,33 @@ function renderTabContent() {
     content.textContent = article.content;
     div.appendChild(content);
 
-    if(article.content.length > 100){
+    if(article.content.length > 80){
       const btn = document.createElement('button');
       btn.textContent = 'Weiterlesen';
-      btn.onclick = () => alert(article.content);
+      btn.onclick = () => {
+        content.style.display = 'block';
+        btn.style.display = 'none';
+      };
+      content.style.display = '-webkit-box';
+      btn.style.marginBottom = '16px';
       div.appendChild(btn);
     }
 
     grid.appendChild(div);
   });
-  container.appendChild(grid);
+  contentDiv.appendChild(grid);
 }
+
+toggleBtn.onclick = () => {
+  sidebarVisible = !sidebarVisible;
+  if(sidebarVisible){
+    sidebar.classList.remove('hidden');
+    contentDiv.classList.remove('full');
+  } else {
+    sidebar.classList.add('hidden');
+    contentDiv.classList.add('full');
+  }
+};
 
 renderTabs();
 renderTabContent();
