@@ -3,44 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <title>Kinder Helfer News</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
     body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #f0f4f8; color: #333; }
     a { text-decoration: none; color: inherit; }
     button { cursor: pointer; }
 
-    /* Header */
     header { background-color: #ff6b6b; color: #fff; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
     header h1 { font-size: 2rem; margin: 0; letter-spacing: 1px; }
 
-    /* Kategorie-Buttons */
-    .categories { padding: 20px 40px; display: flex; gap: 12px; flex-wrap: wrap; }
-    .categories button { padding: 10px 16px; border: 2px solid #ff6b6b; border-radius: 8px; background-color: #fff; font-weight: 600; transition: all 0.2s; }
-    .categories button:hover { background-color: #ff6b6b; color: #fff; }
-    .categories button.active { background-color: #ff6b6b; color: #fff; }
+    .tabs { display: flex; flex-wrap: wrap; padding: 20px 40px; gap: 12px; }
+    .tabs button { padding: 10px 16px; border: 2px solid #ff6b6b; border-radius: 8px; background-color: #fff; font-weight: 600; flex: 1 1 auto; text-align: center; }
+    .tabs button.active { background-color: #ff6b6b; color: #fff; }
 
-    /* Artikel Grid */
-    .articles { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; padding: 20px 40px; }
+    .tab-content { padding: 20px 40px; }
+    .articles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
     .article { background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
     .article:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
     .article img { width: 100%; height: 180px; object-fit: cover; }
-    .article h3 { margin: 16px; font-size: 1.2rem; }
-    .article p { margin: 0 16px 16px 16px; color: #555; font-size: 0.95rem; }
-    .article button { margin: 0 16px 16px 16px; padding: 10px 0; border: none; border-radius: 6px; background-color: #ff6b6b; color: #fff; font-weight: 600; transition: background-color 0.2s; }
-    .article button:hover { background-color: #ff4c4c; }
+    .article h3 { margin: 16px; font-size: 1.1rem; }
+    .article p { margin: 0 16px 16px 16px; color: #555; font-size: 0.9rem; }
 
-    /* Artikel Detail */
-    .article-detail { max-width: 800px; margin: 40px auto; padding: 32px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+    .article-detail { max-width: 90%; margin: 40px auto; padding: 20px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .article-detail img { width: 100%; border-radius: 12px; margin-bottom: 20px; }
-    .article-detail h2 { font-size: 2rem; margin-bottom: 12px; color: #ff6b6b; }
+    .article-detail h2 { font-size: 1.8rem; margin-bottom: 12px; color: #ff6b6b; }
     .article-detail p { line-height: 1.7; color: #555; }
     .back-button { display: inline-block; margin-bottom: 20px; padding: 10px 16px; background-color: #6b7280; color: #fff; border: none; border-radius: 6px; font-weight: 600; transition: background-color 0.2s; }
     .back-button:hover { background-color: #4b5563; }
 
-    /* Footer */
     footer { text-align: center; padding: 24px 0; color: #888; font-size: 0.9rem; background-color: #f0f4f8; border-top: 1px solid #e5e7eb; }
 
-    @media (max-width: 600px) { header, .categories, .articles { padding: 20px; } }
+    @media (max-width: 768px) {
+      header, .tabs, .tab-content { padding: 15px 20px; }
+      .tabs button { flex: 1 1 100%; }
+      .articles { grid-template-columns: 1fr; gap: 16px; }
+      .article img { height: 160px; }
+      .article-detail { padding: 16px; }
+      .article-detail h2 { font-size: 1.5rem; }
+    }
+
+    @media (max-width: 480px) {
+      header h1 { font-size: 1.5rem; }
+      .tabs { padding: 10px; gap: 8px; }
+      .article img { height: 140px; }
+      .article h3 { font-size: 1rem; }
+    }
   </style>
 </head>
 <body>
@@ -49,85 +57,66 @@
   <h1>Kinder Helfer News</h1>
 </header>
 
-<div class="categories" id="categories"></div>
-<div class="articles" id="articles"></div>
+<div class="tabs" id="tabs"></div>
+<div class="tab-content" id="tabContent"></div>
 <div id="articleDetail"></div>
 <footer>© 2026 Kinder Helfer Organisation</footer>
 
 <script>
-const articlesData = [
-  { id: 1, title: "Band spielt für Kinderhilfe", category: "Spendenaktion", content: "Eine lokale Band veranstaltet ein Konzert, dessen Erlös Kinderhilfsprojekten zugutekommt.", image: "https://www.kinderhelfer-nrw.de/s/cc_images/teaserbox_2456154206.jpg?t=1429438906" },
-  { id: 2, title: "Nachhilfe für Kinder", category: "Bildung", content: "Freiwillige bieten kostenlose Nachhilfe für bedürftige Kinder an.", image: "https://www.sos-kinderdoerfer.de/getmedia/3e07615c-7910-4d46-a1cf-aea7bcbe6b31/Kinder-helfen-Kindern-Spendenaktionen-SOS-Kinderdorfer_1.jpg?width=2560&height=1707&ext=.jpg" },
-  { id: 3, title: "Geldspenden helfen effektiv", category: "Finanzen", content: "Jede Spende unterstützt gezielt Projekte, um Kindern ein besseres Leben zu ermöglichen.", image: "https://images.unsplash.com/photo-1583947582886-85c2e9a93620?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=MnwxMjA3fDB8MHxzZWFyY2h8M3x8Y2hpbGRyZW4lMjBzcGVuZGVuJTIwaGlsZmUlMjBkb25hdGlvbnxlbnwwfHwwfHw%3D&ixlib=rb-1.2.1&q=80&w=1080" },
+const tabsData = [
+  { id: 'woGeldHin', name: 'Wo das Geld hinsoll', articles: [
+    { id: 1, title: 'Projekt Kinderhilfe NRW', content: 'Das Geld geht direkt an Kinderhilfsprojekte in NRW.', image: 'https://www.kinderhelfer-nrw.de/s/cc_images/teaserbox_2456154206.jpg?t=1429438906' },
+    { id: 2, title: 'SOS-Kinderdörfer', content: 'Unterstützung für Kinder weltweit.', image: 'https://www.sos-kinderdoerfer.de/getmedia/3e07615c-7910-4d46-a1cf-aea7bcbe6b31/Kinder-helfen-Kindern-Spendenaktionen-SOS-Kinderdorfer_1.jpg?width=2560&height=1707&ext=.jpg' }
+  ]},
+  { id: 'wieGeldBekommen', name: 'Wie wir das Geld bekommen', articles: [
+    { id: 3, title: 'Nachhilfe für Kinder', content: 'Freiwillige bieten Nachhilfe an und sammeln Spenden.', image: 'https://images.unsplash.com/photo-1596495577886-d920f1f3ee88?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080' },
+    { id: 4, title: 'Band spielt für Kinder', content: 'Konzerte und Events generieren Einnahmen für Hilfsprojekte.', image: 'https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080' }
+  ]},
+  { id: 'wasDuMachenKannst', name: 'Was du machen kannst', articles: [
+    { id: 5, title: 'Freiwillige werden', content: 'Kontaktieren Sie uns, um aktiv zu helfen.', image: 'https://images.unsplash.com/photo-1588776814546-73e6f7de0d03?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080' },
+    { id: 6, title: 'Spendenformular', content: 'Hier finden Sie Informationen, wie Sie direkt spenden können.', image: 'https://images.unsplash.com/photo-1589395595558-3c8e5b2e3917?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&w=1080' }
+  ]}
 ];
 
-let currentCategory = 'Alle';
+let currentTab = 'woGeldHin';
 
-function renderCategories() {
-  const categories = ['Alle', 'Spendenaktion', 'Bildung', 'Finanzen'];
-  const container = document.getElementById('categories');
+function renderTabs() {
+  const container = document.getElementById('tabs');
   container.innerHTML = '';
-  categories.forEach(cat => {
+  tabsData.forEach(tab => {
     const btn = document.createElement('button');
-    btn.textContent = cat;
-    if(cat === currentCategory) btn.classList.add('active');
-    btn.onclick = () => { currentCategory = cat; renderArticles(); renderCategories(); };
+    btn.textContent = tab.name;
+    if(tab.id === currentTab) btn.classList.add('active');
+    btn.onclick = () => { currentTab = tab.id; renderTabs(); renderTabContent(); };
     container.appendChild(btn);
   });
 }
 
-function renderArticles() {
-  const container = document.getElementById('articles');
+function renderTabContent() {
+  const container = document.getElementById('tabContent');
   container.innerHTML = '';
-  document.getElementById('articleDetail').innerHTML = '';
-  const filtered = currentCategory === 'Alle' ? articlesData : articlesData.filter(a => a.category === currentCategory);
-  filtered.forEach(article => {
+  const tab = tabsData.find(t => t.id === currentTab);
+  const grid = document.createElement('div');
+  grid.className = 'articles';
+  tab.articles.forEach(article => {
     const div = document.createElement('div');
     div.className = 'article';
     const img = document.createElement('img');
     img.src = article.image;
     const title = document.createElement('h3');
     title.textContent = article.title;
-    const cat = document.createElement('p');
-    cat.textContent = article.category;
-    const btn = document.createElement('button');
-    btn.textContent = 'Weiterlesen';
-    btn.onclick = () => renderArticleDetail(article);
+    const content = document.createElement('p');
+    content.textContent = article.content;
     div.appendChild(img);
     div.appendChild(title);
-    div.appendChild(cat);
-    div.appendChild(btn);
-    container.appendChild(div);
+    div.appendChild(content);
+    grid.appendChild(div);
   });
+  container.appendChild(grid);
 }
 
-function renderArticleDetail(article) {
-  const container = document.getElementById('articleDetail');
-  container.innerHTML = '';
-  const detailDiv = document.createElement('div');
-  detailDiv.className = 'article-detail';
-  const backBtn = document.createElement('button');
-  backBtn.className = 'back-button';
-  backBtn.textContent = '← Zurück';
-  backBtn.onclick = renderArticles;
-  const img = document.createElement('img');
-  img.src = article.image;
-  const title = document.createElement('h2');
-  title.textContent = article.title;
-  const cat = document.createElement('p');
-  cat.textContent = 'Kategorie: ' + article.category;
-  const content = document.createElement('p');
-  content.textContent = article.content;
-  detailDiv.appendChild(backBtn);
-  detailDiv.appendChild(img);
-  detailDiv.appendChild(title);
-  detailDiv.appendChild(cat);
-  detailDiv.appendChild(content);
-  container.appendChild(detailDiv);
-}
-
-renderCategories();
-renderArticles();
+renderTabs();
+renderTabContent();
 </script>
 
 </body>
