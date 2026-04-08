@@ -6,24 +6,25 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #f0f4f8; color: #333; }
-    a { text-decoration: none; color: inherit; }
-    button { cursor: pointer; }
+    body { font-family: 'Roboto', sans-serif; margin: 0; padding: 0; background-color: #f0f4f8; color: #333; display: flex; min-height: 100vh; }
 
-    header { background-color: #ff6b6b; color: #fff; padding: 20px 40px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 6px rgba(0,0,0,0.2); }
-    header h1 { font-size: 2rem; margin: 0; letter-spacing: 1px; }
+    header { position: fixed; top: 0; left: 0; right: 0; background-color: #ff6b6b; color: #fff; padding: 15px 20px; box-shadow: 0 2px 6px rgba(0,0,0,0.2); z-index: 1000; }
+    header h1 { margin: 0; font-size: 1.8rem; letter-spacing: 1px; }
 
-    .tabs { display: flex; flex-wrap: wrap; padding: 20px 40px; gap: 12px; }
-    .tabs button { padding: 10px 16px; border: 2px solid #ff6b6b; border-radius: 8px; background-color: #fff; font-weight: 600; flex: 1 1 auto; text-align: center; }
-    .tabs button.active { background-color: #ff6b6b; color: #fff; }
+    .sidebar { width: 220px; background-color: #fff; border-left: 1px solid #ddd; padding: 20px; margin-top: 70px; position: fixed; right: 0; top: 0; height: 100vh; overflow-y: auto; }
+    .sidebar button { display: block; width: 100%; margin-bottom: 12px; padding: 10px; border: 2px solid #ff6b6b; border-radius: 8px; background-color: #fff; font-weight: 600; text-align: left; transition: all 0.2s; }
+    .sidebar button.active { background-color: #ff6b6b; color: #fff; }
 
-    .tab-content { padding: 20px 40px; }
-    .articles { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 20px; }
+    .content { flex: 1; margin-left: 0; margin-right: 240px; padding: 90px 20px 20px 20px; }
+
+    .articles { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px; }
     .article { background-color: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: flex; flex-direction: column; transition: transform 0.2s, box-shadow 0.2s; }
     .article:hover { transform: translateY(-4px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); }
-    .article img { width: 100%; height: 180px; object-fit: cover; }
+    .article img { width: 100%; object-fit: contain; }
     .article h3 { margin: 16px; font-size: 1.1rem; }
-    .article p { margin: 0 16px 16px 16px; color: #555; font-size: 0.9rem; }
+    .article p { margin: 0 16px 16px 16px; color: #555; font-size: 0.9rem; max-height: 60px; overflow: hidden; }
+    .article button { margin: 0 16px 16px 16px; padding: 8px 0; border: none; border-radius: 6px; background-color: #ff6b6b; color: #fff; font-weight: 600; transition: background-color 0.2s; }
+    .article button:hover { background-color: #ff4c4c; }
 
     .article-detail { max-width: 90%; margin: 40px auto; padding: 20px; background-color: #fff; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
     .article-detail img { width: 100%; border-radius: 12px; margin-bottom: 20px; }
@@ -32,22 +33,13 @@
     .back-button { display: inline-block; margin-bottom: 20px; padding: 10px 16px; background-color: #6b7280; color: #fff; border: none; border-radius: 6px; font-weight: 600; transition: background-color 0.2s; }
     .back-button:hover { background-color: #4b5563; }
 
-    footer { text-align: center; padding: 24px 0; color: #888; font-size: 0.9rem; background-color: #f0f4f8; border-top: 1px solid #e5e7eb; }
+    footer { text-align: center; padding: 24px 0; color: #888; font-size: 0.9rem; background-color: #f0f4f8; border-top: 1px solid #e5e7eb; margin-top: 20px; }
 
     @media (max-width: 768px) {
-      header, .tabs, .tab-content { padding: 15px 20px; }
-      .tabs button { flex: 1 1 100%; }
-      .articles { grid-template-columns: 1fr; gap: 16px; }
-      .article img { height: 160px; }
-      .article-detail { padding: 16px; }
-      .article-detail h2 { font-size: 1.5rem; }
-    }
-
-    @media (max-width: 480px) {
-      header h1 { font-size: 1.5rem; }
-      .tabs { padding: 10px; gap: 8px; }
-      .article img { height: 140px; }
-      .article h3 { font-size: 1rem; }
+      .sidebar { position: relative; width: 100%; height: auto; border-left: none; margin-top: 0; }
+      .content { margin-right: 0; padding-top: 120px; }
+      .articles { grid-template-columns: 1fr; }
+      .article img { height: auto; }
     }
   </style>
 </head>
@@ -57,8 +49,8 @@
   <h1>Kinder Helfer News</h1>
 </header>
 
-<div class="tabs" id="tabs"></div>
-<div class="tab-content" id="tabContent"></div>
+<div class="sidebar" id="tabs"></div>
+<div class="content" id="tabContent"></div>
 <div id="articleDetail"></div>
 <footer>© 2026 Kinder Helfer Organisation</footer>
 
@@ -101,15 +93,26 @@ function renderTabContent() {
   tab.articles.forEach(article => {
     const div = document.createElement('div');
     div.className = 'article';
+
     const img = document.createElement('img');
     img.src = article.image;
+    div.appendChild(img);
+
     const title = document.createElement('h3');
     title.textContent = article.title;
+    div.appendChild(title);
+
     const content = document.createElement('p');
     content.textContent = article.content;
-    div.appendChild(img);
-    div.appendChild(title);
     div.appendChild(content);
+
+    if(article.content.length > 100){
+      const btn = document.createElement('button');
+      btn.textContent = 'Weiterlesen';
+      btn.onclick = () => alert(article.content);
+      div.appendChild(btn);
+    }
+
     grid.appendChild(div);
   });
   container.appendChild(grid);
